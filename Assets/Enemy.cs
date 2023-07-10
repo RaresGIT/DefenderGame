@@ -30,17 +30,20 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        if (Vector3.Distance(player.position, gameObject.transform.position) > 1)
+        if (player != null)
         {
-            Vector3 direction = player.position - transform.position;
-            direction.Normalize();  // Get direction to player
+            if (Vector3.Distance(player.position, gameObject.transform.position) > 1)
+            {
+                Vector3 direction = player.position - transform.position;
+                direction.Normalize();  // Get direction to player
 
-            // Move towards the player
-            transform.position += direction * speed * Time.deltaTime;
+                // Move towards the player
+                transform.position += direction * speed * Time.deltaTime;
 
-            // Face the player
-            Quaternion toRotation = Quaternion.LookRotation(direction, Vector3.up);
-            transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, speed * Time.deltaTime);
+                // Face the player
+                Quaternion toRotation = Quaternion.LookRotation(direction, Vector3.up);
+                transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, speed * Time.deltaTime);
+            }
         }
     }
 

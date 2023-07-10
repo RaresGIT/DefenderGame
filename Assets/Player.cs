@@ -11,6 +11,12 @@ public class Player : MonoBehaviour
     public float immunitySeconds = 0.1f;
     private bool canTakeDamage = true;
 
+    public int maxAmmo = 10;
+    public int currentAmmo;
+    public float reloadCooldown = 1f;
+    public bool isReloading = false;
+    public bool canShoot = true;
+
     private Dictionary<Enemy, int> enemyDamageTracker = new Dictionary<Enemy, int>();  // Track damage from individual enemies
 
 
@@ -76,9 +82,18 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(immunitySeconds);
         canTakeDamage = true;
     }
+
+    private System.Collections.IEnumerator Reload()
+    {
+        yield return new WaitForSeconds(reloadCooldown);
+        currentAmmo = maxAmmo;
+        isReloading = false;
+        canShoot = true;
+    }
     void Start()
     {
         cam = Camera.main;
+        currentAmmo = maxAmmo;
 
     }
 
@@ -101,10 +116,19 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(1))  // Left click is pressed
-        {
-            // Spawn a bullet
-            Instantiate(bulletPrefab, bulletSpawnPoint.position, transform.rotation * Quaternion.Euler(0, 90, 0));
-        }
+        if (Input.GetMouseButtonDown(1) && canShoot)  // Left click is pressed
+            if (currentAmmo > 0)
+            {
+                // Spawn a bullet
+                Instantiate(bulletPrefab, bulletSpawnPoint.position, transform.rotation * Quaternion.Euler(0, 90, 0));
+                currentAmmo -= 1;
+            }
+            else if (isReloading == false)
+            {
+                isReloading = true;
+                canShoot = false;
+                StartCoroutine(Reload());
+
+            }
     }
 }
