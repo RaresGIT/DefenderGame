@@ -1,16 +1,20 @@
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
-public class Enemy : MonoBehaviour
+public class MeleeEnemy : MonoBehaviour
 {
     public Transform player;
     public float speed = 5f;
     public int health;  // Enemy's health
     public int maxHealth = 40;
     public int damage = 10;  // Damage dealt by the enemy
+    public float minKnockback = 10f;
+    public float maxKnockback = 20f;
 
     private bool canDealDamage = true;
-    public float fireRate = 1f;
+
+
+    public float fireRate = 0.2f;
 
     FloatingHealthBar healthBar;
 
@@ -30,6 +34,12 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
+
+    }
+
+    void FixedUpdate()
+    {
+        //random dumb ai, just walks to the player
         if (player != null)
         {
             if (Vector3.Distance(player.position, gameObject.transform.position) > 1)
@@ -59,20 +69,35 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    void OnCollisionStay(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
             Player player = collision.gameObject.GetComponent<Player>();
-            Enemy enemyScript = GetComponent<Enemy>();
+            MeleeEnemy enemyScript = GetComponent<MeleeEnemy>();
 
             if (player != null && enemyScript != null && canDealDamage)
             {
                 // waits for fire rate for each enemy before starting to register the hit
                 player.RegisterEnemyDamage(enemyScript, damage);
                 StartCoroutine(WaitFireRate());
+
+
+                Vector3 direction = (transform.position - collision.transform.position).normalized;
+                direction.y = 0;
+
+                float randomKnockbackAmount = Random.Range(minKnockback, maxKnockback);
+                Vector3 knockback = direction * randomKnockbackAmount;
+
+                enemyScript.GetComponent<Rigidbody>().AddForce(knockback, ForceMode.Impulse);
+
             }
         }
+    }
+
+    void OnCollisionStay(Collision collision)
+    {
+
 
     }
 

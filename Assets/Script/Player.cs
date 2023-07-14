@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     public GameObject bulletPrefab;
     public int health = 100;  // Player's health
     public int maxHealth = 100;
-    public float immunitySeconds = 0.1f;
+    public float immunitySeconds = 0.05f;
     private bool canTakeDamage = true;
 
     public int maxAmmo = 10;
@@ -17,7 +17,13 @@ public class Player : MonoBehaviour
     public bool isReloading = false;
     public bool canShoot = true;
 
-    private Dictionary<Enemy, int> enemyDamageTracker = new Dictionary<Enemy, int>();  // Track damage from individual enemies
+    float startTime = 0f;
+    float currentTime = 0f;
+
+
+
+
+    private Dictionary<MeleeEnemy, int> enemyDamageTracker = new Dictionary<MeleeEnemy, int>();  // Track damage from individual enemies
 
 
     public void TakeDamage(int damage)
@@ -29,16 +35,14 @@ public class Player : MonoBehaviour
             enemyDamageTracker.Clear();
         }
 
-
         if (health <= 0)
         {
             Destroy(gameObject);
         }
 
-
     }
 
-    public void RegisterEnemyDamage(Enemy enemy, int damage)
+    public void RegisterEnemyDamage(MeleeEnemy enemy, int damage)
     {
         if (enemyDamageTracker.ContainsKey(enemy))
         {
@@ -49,12 +53,11 @@ public class Player : MonoBehaviour
             enemyDamageTracker.Add(enemy, damage);
         }
 
+
         ApplyEnemyDamage();
-
-
     }
 
-    public void UnregisterEnemyDamage(Enemy enemy)
+    public void UnregisterEnemyDamage(MeleeEnemy enemy)
     {
         if (enemyDamageTracker.ContainsKey(enemy))
         {
@@ -92,13 +95,16 @@ public class Player : MonoBehaviour
     }
     void Start()
     {
+        startTime = Time.deltaTime;
         cam = Camera.main;
         currentAmmo = maxAmmo;
 
     }
 
+
     void Update()
     {
+        var deltaT = currentTime - startTime;
         if (Input.GetMouseButton(0))
         {
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
@@ -116,19 +122,38 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(1) && canShoot)  // Left click is pressed
-            if (currentAmmo > 0)
-            {
-                // Spawn a bullet
-                Instantiate(bulletPrefab, bulletSpawnPoint.position, transform.rotation * Quaternion.Euler(0, 90, 0));
-                currentAmmo -= 1;
-            }
-            else if (isReloading == false)
-            {
-                isReloading = true;
-                canShoot = false;
-                StartCoroutine(Reload());
 
-            }
+        if (deltaT >= 0.1)
+        {
+            currentTime = 0;
+            if (canShoot)  // Left click is pressed
+                if (currentAmmo > 0)
+                {
+
+                    // Spawn a bullet
+                    Instantiate(bulletPrefab, bulletSpawnPoint.position, transform.rotation * Quaternion.Euler(0, 90, 0));
+                    currentAmmo -= 1;
+                }
+                else if (isReloading == false)
+                {
+                    isReloading = true;
+                    canShoot = false;
+                    StartCoroutine(Reload());
+
+                }
+
+        }
+        else
+        {
+            currentTime += Time.deltaTime;
+        }
+
+    }
+
+
+
+    private void FixedUpdate()
+    {
+
     }
 }

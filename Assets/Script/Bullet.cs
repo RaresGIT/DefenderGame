@@ -16,7 +16,7 @@ public class Bullet : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))  // The bullet hit an enemy
         {
-            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+            MeleeEnemy enemy = collision.gameObject.GetComponent<MeleeEnemy>();
             enemy.TakeDamage(damage);  // Damage the enemy
             Destroy(gameObject);  // Destroy the bullet
         }

@@ -1820,7 +1820,7 @@ PrefabInstance:
     - target: {fileID: 6362039403146613444, guid: 4566e1397d8114d4ebd83c8c4b96af21, type: 3}
       propertyPath: enemyPrefab
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 7191986619931522263, guid: ef8504d8915c27744beeffacddd94bfb, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
